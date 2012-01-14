@@ -40,6 +40,9 @@ Block::Block(const Block& block)
 
 Block::~Block()
 {
+	for (int x = 0; x < this->mSize; x++)
+		delete []this->mSubBlocks[x];
+	delete []this->mSubBlocks;
 }
 
 void Block::doRender()

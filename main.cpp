@@ -107,6 +107,22 @@ void doStep()
 		}
 		else
 		{
+			bool deleteAll = false;
+			for (vector<Particle*>::iterator i = particles.begin(); i != particles.end(); ++i)
+				if ((*i)->mLocal.m[3][1] < 0)
+					deleteAll = true;
+
+			if (deleteAll == true)
+			{
+				while (particles.empty() == false)
+				{
+					Particle* tmp = particles.back();
+					particles.pop_back();
+					delete tmp;
+				}
+				cout << particles.size() << endl;
+			}
+			
 			int fullRowCount = field->addBlocks(currentBlock, particles);
 			if (fullRowCount == -1)
 			{
@@ -117,13 +133,14 @@ void doStep()
 				deadText = ss.str();
 			}
 			else if (fullRowCount == 1)
-				setScore(score + 10);
+				setScore(score + 10 * level);
 			else if (fullRowCount == 2)
-				setScore(score + 25);
+				setScore(score + 25 * level);
 			else if (fullRowCount == 3)
-				setScore(score + 50);
+				setScore(score + 50 * level);
 			else if (fullRowCount == 4)
-				setScore(score + 100);
+				setScore(score + 100 * level);
+			delete currentBlock;
 			currentBlock = nextBlock;
 			nextBlock = Block::randomBlock(field);
 			levelCounter++;
@@ -162,7 +179,7 @@ void onRender(float elapsed)
 	glPushMatrix();
 	glTranslatef(0.0f, 0.0f, -55.0f);
 	glScalef(10, 10, 10);
-	glRotatef(elapsed * 50, 1.0f, 0.0f, 0.0f);
+//	glRotatef(elapsed * 50, 1.0f, 0.0f, 0.0f);
 	glRotatef(elapsed * 30, 0.0f, 1.0f, 0.0f);
 	glColor3f(0, 0, 0);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -310,6 +327,18 @@ int main(int argc, char** argv)
 		// Finally, display rendered frame on screen
 		app.Display();
 	}
+	
+	// Cleanup
+	while (particles.empty() == false)
+	{
+		Particle* tmp = particles.back();
+		particles.pop_back();
+		delete tmp;
+	}
+	delete currentBlock;
+	delete nextBlock;
+	delete field;
+	
 	return 0;
 }
 
